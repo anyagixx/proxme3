@@ -4976,7 +4976,9 @@ white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 green "MTProto Proxy Installation Complete!"
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
-echo -e "MTProto Link: ${yellow}tg://proxy?server=${mtp_ip}&port=${mtp_port}&secret=${mtp_secret}${plain}"
+echo -e "MTProto Link (tg://): ${yellow}tg://proxy?server=${mtp_ip}&port=${mtp_port}&secret=${mtp_secret}${plain}"
+echo
+echo -e "MTProto Link (https://): ${yellow}https://t.me/proxy?server=${mtp_ip}&port=${mtp_port}&secret=${mtp_secret}${plain}"
 echo
 blue "Manual Configuration:"
 echo "  Server: $mtp_ip"
@@ -4985,7 +4987,7 @@ echo "  Secret: $mtp_secret"
 echo "  Fake TLS Domain: $mtp_domain"
 echo
 yellow "Usage in Telegram:"
-echo "  1. Click the MTProto link above to auto-configure"
+echo "  1. Click any MTProto link above to auto-configure"
 echo "  2. Or manually add proxy in Telegram settings"
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -5028,7 +5030,9 @@ white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 green "MTProto Proxy Configuration"
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
-echo -e "MTProto Link: ${yellow}tg://proxy?server=${MTP_IP}&port=${MTP_PORT}&secret=${MTP_SECRET}${plain}"
+echo -e "MTProto Link (tg://): ${yellow}tg://proxy?server=${MTP_IP}&port=${MTP_PORT}&secret=${MTP_SECRET}${plain}"
+echo
+echo -e "MTProto Link (https://): ${yellow}https://t.me/proxy?server=${MTP_IP}&port=${MTP_PORT}&secret=${MTP_SECRET}${plain}"
 echo
 blue "Connection Details:"
 echo "  Server: $MTP_IP"
@@ -5037,7 +5041,7 @@ echo "  Secret: $MTP_SECRET"
 echo "  Fake TLS Domain: $MTP_DOMAIN"
 echo
 yellow "Usage in Telegram:"
-echo "  1. Click the MTProto link above to auto-configure"
+echo "  1. Click any MTProto link above to auto-configure"
 echo "  2. Or go to Settings > Data and Storage > Proxy > Add Proxy"
 echo "  3. Select MTProto and enter the details above"
 echo
