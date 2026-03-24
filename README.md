@@ -84,6 +84,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00.s
 | **18** | **Dumbproxy HTTPS proxy (simple proxy with auto SSL)** |
 | **19** | **SOCKS5 proxy for Telegram (via Sing-box)** |
 | **20** | **MTProto proxy for Telegram (via Docker)** |
+| **21** | **TURN Proxy (bypass censorship via VK/Yandex)** |
 
 ---
 
@@ -166,6 +167,66 @@ Manual:
   Server: YOUR_IP
   Port: 443
   Secret: (auto-generated hex string)
+```
+
+---
+
+## TURN Proxy (Menu item 21)
+
+Bypass censorship by tunneling WireGuard traffic through VK Calls or Yandex Telemost TURN servers.
+
+**How it works:**
+```
+[Client] --DTLS--> [TURN Server VK/Yandex] --UDP--> [Your VPS] --> [WireGuard] --> Internet
+```
+
+**Features:**
+- Auto-install WireGuard if not present
+- Auto-generated WireGuard keys
+- Support for both VK Calls and Yandex Telemost
+- Full Alpine Linux support (OpenRC)
+- Complete client setup instructions
+
+**VK Calls vs Yandex Telemost:**
+
+| Feature | VK Calls | Yandex Telemost |
+|---------|----------|-----------------|
+| Speed | ~5 Mbps | No limit |
+| Threads | 1 (risk of ban) | Multiple OK |
+| Link source | Create or find online | Create at telemost.yandex.ru |
+
+**Installation:**
+1. Menu 21 → Option 1 (VK) or Option 2 (Yandex)
+2. Server automatically configured with WireGuard
+3. Follow displayed client instructions
+
+**Client Setup:**
+1. Download client from: https://github.com/cacggghp/vk-turn-proxy/releases
+2. Get a VK/Yandex call link
+3. Run client:
+   ```bash
+   # VK
+   ./client-linux -peer YOUR_VPS_IP:56000 -vk-link "https://vk.com/call/join/xxx" -listen 127.0.0.1:9000
+   
+   # Yandex
+   ./client-linux -udp -turn 5.255.211.241 -peer YOUR_VPS_IP:56000 -yandex-link "https://telemost.yandex.ru/j/xxx" -listen 127.0.0.1:9000
+   ```
+4. Configure WireGuard client with provided config
+5. **Important:** Add VPN client app to WireGuard exclusions!
+
+**WireGuard Client Config:**
+```
+[Interface]
+PrivateKey = (auto-generated)
+Address = 10.20.0.2/24
+MTU = 1280
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = (server public key)
+Endpoint = 127.0.0.1:9000
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
 ```
 
 ---

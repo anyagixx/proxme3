@@ -1,14 +1,23 @@
 v25.3.24 Update Notes:
 
-This update adds MTProto proxy for Telegram
-
 New Features:
 1. MTProto proxy for Telegram via Docker (menu item 20)
-2. Auto-install Docker if not present
-3. Port selection with conflict detection (default 443)
-4. Fake TLS domain selection (google.com, cloudflare.com, microsoft.com, apple.com, amazon.com, github.com, or custom)
-5. Auto-generated secret key (16-byte hex)
-6. Full Alpine Linux support (OpenRC)
-7. tg://proxy link for one-click Telegram configuration
+2. TURN Proxy for censorship bypass via VK/Yandex calls (menu item 21)
+3. Auto-install WireGuard for TURN Proxy
+4. Auto-generated WireGuard keys and configs
+5. Full client setup instructions for all platforms
+
+MTProto Proxy (Menu 20):
+- Auto Docker installation
+- Port selection with conflict detection (default 443)
+- Fake TLS domain selection
+- Auto-generated secret key
+- tg://proxy and https://t.me/proxy links
+
+TURN Proxy (Menu 21):
+- VK Calls support (~5 Mbps, single thread)
+- Yandex Telemost support (no speed limit)
+- WireGuard auto-installation
+- Complete client instructions for Linux/Windows/macOS/Android
 
 See: https://github.com/anyagixx/proxme3

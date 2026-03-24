@@ -5119,6 +5119,504 @@ case "$menu" in
 esac
 }
 
+check_wireguard(){
+if command -v wg &> /dev/null; then
+return 0
+fi
+
+green "WireGuard not detected, installing..."
+
+if [[ x"${release}" == x"alpine" ]]; then
+apk update
+apk add wireguard-tools
+else
+if [ -x "$(command -v apt-get)" ]; then
+apt-get update
+apt-get install -y wireguard-tools
+elif [ -x "$(command -v yum)" ]; then
+yum install -y wireguard-tools
+elif [ -x "$(command -v dnf)" ]; then
+dnf install -y wireguard-tools
+fi
+fi
+
+if command -v wg &> /dev/null; then
+green "WireGuard installed successfully!"
+return 0
+else
+red "Failed to install WireGuard!"
+return 1
+fi
+}
+
+download_turn_binary(){
+local binary_name=$1
+local binary_url="https://github.com/cacggghp/vk-turn-proxy/releases/download/v1.1.1/${binary_name}"
+local target_path="/usr/local/bin/turn-server"
+
+green "Downloading TURN proxy server binary..."
+if ! curl -L -o "$target_path" "$binary_url" 2>/dev/null; then
+red "Failed to download TURN server binary!"
+return 1
+fi
+
+chmod +x "$target_path"
+green "TURN server binary downloaded successfully!"
+return 0
+}
+
+generate_wg_keys(){
+local private_key=$(wg genkey)
+local public_key=$(echo "$private_key" | wg pubkey)
+echo "$private_key|$public_key"
+}
+
+install_turn(){
+local turn_type=$1
+
+if [[ -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is already installed!" && sleep 2 && manage_turn
+return
+fi
+
+green "Installing TURN Proxy ($turn_type)..."
+
+if ! check_wireguard; then
+red "WireGuard installation failed. Cannot continue." && sleep 2 && manage_turn
+return
+fi
+
+green "1. Generating WireGuard keys..."
+local server_keys=$(generate_wg_keys)
+local server_private=$(echo "$server_keys" | cut -d'|' -f1)
+local server_public=$(echo "$server_keys" | cut -d'|' -f2)
+
+local client_keys=$(generate_wg_keys)
+local client_private=$(echo "$client_keys" | cut -d'|' -f1)
+local client_public=$(echo "$client_keys" | cut -d'|' -f2)
+
+green "2. Detecting external IP..."
+local server_ip
+server_ip=$(curl -s4m5 ip.sb 2>/dev/null || curl -s4m5 icanhazip.com 2>/dev/null)
+
+if [[ -z "$server_ip" ]]; then
+server_ip=$(curl -s6m5 ip.sb 2>/dev/null || curl -s6m5 icanhazip.com 2>/dev/null)
+fi
+
+if [[ -z "$server_ip" ]]; then
+red "Failed to detect external IP address" && sleep 2 && manage_turn
+return
+fi
+
+green "External IP: $server_ip"
+
+green "3. Creating WireGuard configuration..."
+local wg_port=51821
+local turn_port=56000
+local wg_interface="wg1"
+
+while ss -tunlp 2>/dev/null | grep -q ":${wg_port} "; do
+wg_port=$((wg_port + 1))
+done
+
+while ss -tunlp 2>/dev/null | grep -q ":${turn_port} "; do
+turn_port=$((turn_port + 1))
+done
+
+mkdir -p /etc/wireguard
+
+cat > /etc/wireguard/${wg_interface}.conf <<EOF
+[Interface]
+PrivateKey = ${server_private}
+Address = 10.20.0.1/24
+ListenPort = ${wg_port}
+MTU = 1280
+
+[Peer]
+PublicKey = ${client_public}
+AllowedIPs = 10.20.0.2/32
+EOF
+
+chmod 600 /etc/wireguard/${wg_interface}.conf
+
+green "4. Downloading TURN server binary..."
+if ! download_turn_binary "server-linux"; then
+rm -f /etc/wireguard/${wg_interface}.conf
+sleep 2 && manage_turn
+return
+fi
+
+green "5. Creating systemd service..."
+cat > /etc/systemd/system/turnproxy.service <<EOF
+[Unit]
+Description=TURN Proxy Server (Censorship Bypass)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/turn-server -listen 0.0.0.0:${turn_port} -connect 127.0.0.1:${wg_port}
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+green "6. Saving configuration..."
+mkdir -p /etc/turnproxy
+cat > /etc/turnproxy/config.env <<EOF
+TURN_TYPE=${turn_type}
+TURN_PORT=${turn_port}
+WG_PORT=${wg_port}
+WG_INTERFACE=${wg_interface}
+SERVER_IP=${server_ip}
+SERVER_PUBLIC_KEY=${server_public}
+CLIENT_PRIVATE_KEY=${client_private}
+CLIENT_PUBLIC_KEY=${client_public}
+EOF
+
+cat > /etc/turnproxy/client.conf <<EOF
+[Interface]
+PrivateKey = ${client_private}
+Address = 10.20.0.2/24
+MTU = 1280
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = ${server_public}
+Endpoint = 127.0.0.1:9000
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+EOF
+
+green "7. Starting services..."
+if [[ x"${release}" == x"alpine" ]]; then
+modprobe wireguard 2>/dev/null || true
+wg-quick up ${wg_interface} 2>/dev/null || true
+rc-update add turnproxy default 2>/dev/null || true
+rc-service turnproxy start 2>/dev/null || /usr/local/bin/turn-server -listen 0.0.0.0:${turn_port} -connect 127.0.0.1:${wg_port} &
+else
+systemctl daemon-reload
+systemctl enable wg-quick@${wg_interface}
+systemctl start wg-quick@${wg_interface}
+systemctl enable turnproxy
+systemctl start turnproxy
+fi
+
+sleep 2
+
+echo
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+green "TURN Proxy ($turn_type) Installation Complete!"
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo
+blue "Server Configuration:"
+echo "  Server IP: $server_ip"
+echo "  TURN Port: $turn_port"
+echo "  WireGuard Port: $wg_port"
+echo "  WireGuard Interface: $wg_interface"
+echo
+show_turn_client_instructions "$turn_type" "$server_ip" "$turn_port"
+}
+
+show_turn_client_instructions(){
+local turn_type=$1
+local server_ip=$2
+local turn_port=$3
+
+white "════════════════════════════════════════════════════════"
+green "CLIENT SETUP INSTRUCTIONS"
+white "════════════════════════════════════════════════════════"
+echo
+yellow "STEP 1: Download client for your OS"
+white "────────────────────────────────────"
+echo "Linux:   https://github.com/cacggghp/vk-turn-proxy/releases/download/v1.1.1/client-linux"
+echo "Windows: https://github.com/cacggghp/vk-turn-proxy/releases/download/v1.1.1/client.exe"
+echo "macOS:   https://github.com/cacggghp/vk-turn-proxy/releases/download/v1.1.1/client-macos"
+echo "Android: https://github.com/MYSOREZ/vk-turn-proxy-android (recommended app)"
+echo "         Or use Termux with client-android binary"
+echo
+yellow "STEP 2: Get ${turn_type} link"
+white "────────────────────────────────────"
+
+if [[ "$turn_type" == "VK" ]]; then
+echo "Option A: Create your own call at https://vk.com/call"
+echo "Option B: Search Google for: \"https://vk.com/call/join/\""
+echo "Link format: https://vk.com/call/join/xxxxxxxxx"
+echo
+yellow "STEP 3: Run client"
+white "────────────────────────────────────"
+echo "Linux/macOS:"
+echo "  chmod +x client-linux"
+echo "  ./client-linux -peer ${server_ip}:${turn_port} -vk-link \"YOUR_VK_LINK\" -listen 127.0.0.1:9000"
+echo
+echo "Windows (PowerShell):"
+echo "  .\client.exe -peer ${server_ip}:${turn_port} -vk-link \"YOUR_VK_LINK\" -listen 127.0.0.1:9000"
+echo
+echo "Android (Termux):"
+echo "  ./client-android -peer ${server_ip}:${turn_port} -vk-link \"YOUR_VK_LINK\" -listen 127.0.0.1:9000"
+else
+echo "Create your own call at https://telemost.yandex.ru"
+echo "Click 'Создать видеовстречу' and copy the link"
+echo "Link format: https://telemost.yandex.ru/j/xxxxxxxxx"
+echo
+echo "Working Yandex TURN IPs:"
+echo "  5.255.211.241, 5.255.211.242, 5.255.211.243"
+echo "  5.255.211.245, 5.255.211.246"
+echo
+yellow "STEP 3: Run client"
+white "────────────────────────────────────"
+echo "Linux/macOS:"
+echo "  chmod +x client-linux"
+echo "  ./client-linux -udp -turn 5.255.211.241 -peer ${server_ip}:${turn_port} -yandex-link \"YOUR_YANDEX_LINK\" -listen 127.0.0.1:9000"
+echo
+echo "Windows (PowerShell):"
+echo "  .\client.exe -udp -turn 5.255.211.241 -peer ${server_ip}:${turn_port} -yandex-link \"YOUR_YANDEX_LINK\" -listen 127.0.0.1:9000"
+echo
+echo "Android (Termux):"
+echo "  ./client-android -udp -turn 5.255.211.241 -peer ${server_ip}:${turn_port} -yandex-link \"YOUR_YANDEX_LINK\" -listen 127.0.0.1:9000"
+fi
+
+echo
+yellow "STEP 4: WireGuard client configuration"
+white "────────────────────────────────────"
+echo "Create a new WireGuard tunnel with these settings:"
+echo
+cat /etc/turnproxy/client.conf
+echo
+red "IMPORTANT: Add your VPN client app to WireGuard exclusions!"
+echo
+white "════════════════════════════════════════════════════════"
+}
+
+uninstall_turn(){
+if [[ ! -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is not installed!" && sleep 2 && manage_turn
+return
+fi
+
+source /etc/turnproxy/config.env
+
+readp "Are you sure you want to uninstall TURN Proxy? [y/n]: " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+manage_turn
+return
+fi
+
+green "Uninstalling TURN Proxy..."
+
+if [[ x"${release}" == x"alpine" ]]; then
+rc-service turnproxy stop 2>/dev/null
+rc-update del turnproxy default 2>/dev/null
+wg-quick down ${WG_INTERFACE} 2>/dev/null
+else
+systemctl stop turnproxy 2>/dev/null
+systemctl disable turnproxy 2>/dev/null
+systemctl stop wg-quick@${WG_INTERFACE} 2>/dev/null
+systemctl disable wg-quick@${WG_INTERFACE} 2>/dev/null
+fi
+
+rm -f /etc/systemd/system/turnproxy.service
+rm -f /etc/wireguard/${WG_INTERFACE}.conf
+rm -rf /etc/turnproxy
+rm -f /usr/local/bin/turn-server
+
+if [[ x"${release}" != x"alpine" ]]; then
+systemctl daemon-reload
+fi
+
+green "TURN Proxy uninstalled successfully!"
+sleep 2
+manage_turn
+}
+
+show_turn_info(){
+if [[ ! -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is not installed!" && sleep 2 && manage_turn
+return
+fi
+
+source /etc/turnproxy/config.env
+
+echo
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+green "TURN Proxy Configuration (${TURN_TYPE})"
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo
+blue "Server Settings:"
+echo "  Server IP: $SERVER_IP"
+echo "  TURN Port: $TURN_PORT"
+echo "  WireGuard Port: $WG_PORT"
+echo "  WireGuard Interface: $WG_INTERFACE"
+echo
+blue "WireGuard Public Key:"
+echo "  $SERVER_PUBLIC_KEY"
+echo
+show_turn_client_instructions "$TURN_TYPE" "$SERVER_IP" "$TURN_PORT"
+}
+
+regenerate_turn_keys(){
+if [[ ! -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is not installed!" && sleep 2 && manage_turn
+return
+fi
+
+source /etc/turnproxy/config.env
+
+readp "Regenerate WireGuard keys? This will break existing clients. [y/n]: " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+manage_turn
+return
+fi
+
+green "Regenerating WireGuard keys..."
+
+local server_keys=$(generate_wg_keys)
+local server_private=$(echo "$server_keys" | cut -d'|' -f1)
+local server_public=$(echo "$server_keys" | cut -d'|' -f2)
+
+local client_keys=$(generate_wg_keys)
+local client_private=$(echo "$client_keys" | cut -d'|' -f1)
+local client_public=$(echo "$client_keys" | cut -d'|' -f2)
+
+if [[ x"${release}" == x"alpine" ]]; then
+wg-quick down ${WG_INTERFACE} 2>/dev/null
+else
+systemctl stop wg-quick@${WG_INTERFACE} 2>/dev/null
+fi
+
+cat > /etc/wireguard/${WG_INTERFACE}.conf <<EOF
+[Interface]
+PrivateKey = ${server_private}
+Address = 10.20.0.1/24
+ListenPort = ${WG_PORT}
+MTU = 1280
+
+[Peer]
+PublicKey = ${client_public}
+AllowedIPs = 10.20.0.2/32
+EOF
+
+sed -i "s|^SERVER_PUBLIC_KEY=.*|SERVER_PUBLIC_KEY=${server_public}|" /etc/turnproxy/config.env
+sed -i "s|^CLIENT_PRIVATE_KEY=.*|CLIENT_PRIVATE_KEY=${client_private}|" /etc/turnproxy/config.env
+sed -i "s|^CLIENT_PUBLIC_KEY=.*|CLIENT_PUBLIC_KEY=${client_public}|" /etc/turnproxy/config.env
+
+cat > /etc/turnproxy/client.conf <<EOF
+[Interface]
+PrivateKey = ${client_private}
+Address = 10.20.0.2/24
+MTU = 1280
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = ${server_public}
+Endpoint = 127.0.0.1:9000
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+EOF
+
+if [[ x"${release}" == x"alpine" ]]; then
+wg-quick up ${WG_INTERFACE} 2>/dev/null
+else
+systemctl start wg-quick@${WG_INTERFACE} 2>/dev/null
+fi
+
+green "WireGuard keys regenerated successfully!"
+echo
+show_turn_info
+}
+
+restart_turn(){
+if [[ ! -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is not installed!" && sleep 2 && manage_turn
+return
+fi
+
+green "Restarting TURN Proxy..."
+
+if [[ x"${release}" == x"alpine" ]]; then
+rc-service turnproxy restart 2>/dev/null || {
+pkill -f turn-server 2>/dev/null
+source /etc/turnproxy/config.env
+/usr/local/bin/turn-server -listen 0.0.0.0:${TURN_PORT} -connect 127.0.0.1:${WG_PORT} &
+}
+else
+systemctl restart turnproxy 2>/dev/null
+fi
+
+green "TURN Proxy restarted successfully!"
+sleep 2
+manage_turn
+}
+
+view_turn_logs(){
+if [[ ! -f /etc/turnproxy/config.env ]]; then
+red "TURN Proxy is not installed!" && sleep 2 && manage_turn
+return
+fi
+
+echo
+green "TURN Proxy Service Status:"
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+if [[ x"${release}" == x"alpine" ]]; then
+rc-service turnproxy status 2>/dev/null || echo "Service not running"
+else
+systemctl status turnproxy 2>/dev/null | head -20
+fi
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo
+green "WireGuard Interface Status:"
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+source /etc/turnproxy/config.env
+wg show ${WG_INTERFACE} 2>/dev/null || echo "Interface not available"
+white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo
+readp "Press Enter to return to menu..."
+manage_turn
+}
+
+manage_turn(){
+echo
+green "TURN Proxy Management (Censorship Bypass)"
+echo
+if [[ -f /etc/turnproxy/config.env ]]; then
+source /etc/turnproxy/config.env 2>/dev/null
+blue "Status: Installed (${TURN_TYPE})"
+echo "Server IP: $SERVER_IP"
+echo "TURN Port: $TURN_PORT"
+echo "WireGuard Interface: $WG_INTERFACE"
+if [[ x"${release}" == x"alpine" ]]; then
+rc-service turnproxy status >/dev/null 2>&1 && echo "Service: Running" || echo "Service: Stopped"
+else
+systemctl is-active turnproxy >/dev/null 2>&1 && echo "Service: Running" || echo "Service: Stopped"
+fi
+else
+blue "Status: Not installed"
+fi
+echo
+yellow "1：Install TURN Proxy (VK Calls) - Speed ~5 Mbps"
+yellow "2：Install TURN Proxy (Yandex Telemost) - No speed limit"
+yellow "3：Uninstall TURN Proxy"
+yellow "4：Show client setup instructions"
+yellow "5：Regenerate WireGuard keys"
+yellow "6：Restart TURN Proxy service"
+yellow "7：View status and logs"
+yellow "0：Return to main menu"
+readp "Please select [0-7]: " menu
+
+case "$menu" in
+1) install_turn "VK" ;;
+2) install_turn "Yandex" ;;
+3) uninstall_turn ;;
+4) show_turn_info ;;
+5) regenerate_turn_keys ;;
+6) restart_turn ;;
+7) view_turn_logs ;;
+0) sb ;;
+*) manage_turn ;;
+esac
+}
+
 changeip(){
 v4v6
 chip(){
@@ -6484,6 +6982,7 @@ green "17. User management (add/delete users)"
 green "18. Dumbproxy HTTPS proxy (simple proxy with auto SSL)"
 green "19. SOCKS5 proxy for Telegram (via Sing-box)"
 green "20. MTProto proxy for Telegram (via Docker)"
+green "21. TURN Proxy (bypass censorship via VK/Yandex)"
 white "----------------------------------------------------------------------------------"
 green " 0. Exit script"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -6592,7 +7091,7 @@ showprotocol
 fi
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
-readp "Please enter number [0-20]: " Input
+readp "Please enter number [0-21]: " Input
 case "$Input" in  
  1 ) instsllsingbox;;
  2 ) unins;;
@@ -6614,5 +7113,6 @@ case "$Input" in
 18 ) manage_dumbproxy;;
 19 ) manage_socks5;;
 20 ) manage_mtproto;;
+21 ) manage_turn;;
 * ) exit
 esac
