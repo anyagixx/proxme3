@@ -1,12 +1,14 @@
-v25.2.9 Update Notes:
+v25.3.24 Update Notes:
 
-This update requires uninstall and reinstall
+This update adds MTProto proxy for Telegram
 
-This update requires uninstall and reinstall
+New Features:
+1. MTProto proxy for Telegram via Docker (menu item 20)
+2. Auto-install Docker if not present
+3. Port selection with conflict detection (default 443)
+4. Fake TLS domain selection (google.com, cloudflare.com, microsoft.com, apple.com, amazon.com, github.com, or custom)
+5. Auto-generated secret key (16-byte hex)
+6. Full Alpine Linux support (OpenRC)
+7. tg://proxy link for one-click Telegram configuration
 
-This update requires uninstall and reinstall
-
-Update content:
-First-time installation adds kernel version selection between 1.10 and post-1.10, split into 1.10 kernel (supports geosite routing) and post-1.10 kernel (does not support geosite routing). Menu 8-3 allows free switching between kernel versions.
-
-See: https://ygkkk.blogspot.com/2023/10/sing-box-yg.html
+See: https://github.com/anyagixx/proxme3
