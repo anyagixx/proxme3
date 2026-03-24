@@ -29,7 +29,7 @@ local ARGO_AUTH=${12}
   else
     echo "Argo has set fixed domain: ${ARGO_DOMAIN}"
   fi
-  remote_command="export reym=$REALITY UUID=$SUUID vless_port=$TCP1_PORT vmess_port=$TCP2_PORT hy2_port=$UDP_PORT reset=$RES resport=$REP ARGO_DOMAIN=${ARGO_DOMAIN} ARGO_AUTH=${ARGO_AUTH} && bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00keep.sh)"
+  remote_command="export reym=$REALITY UUID=$SUUID vless_port=$TCP1_PORT vmess_port=$TCP2_PORT hy2_port=$UDP_PORT reset=$RES resport=$REP ARGO_DOMAIN=${ARGO_DOMAIN} ARGO_AUTH=${ARGO_AUTH} && bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00keep.sh)"
   echo "Executing remote command on $HOST as $SSH_USER with command: $remote_command"
   sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$SSH_USER@$HOST" "$remote_command"
 }
@@ -51,7 +51,7 @@ else
 fi
 echo "*****************************************************"
 echo "*****************************************************"
-echo "GitHub Project: github.com/anyagixx/proxme2"
+echo "GitHub Project: github.com/anyagixx/proxme3"
 echo "Original Author Blog: ygkkk.blogspot.com"
 echo "Original Author YouTube: www.youtube.com/@ygkkk"
 echo "Auto Remote Deploy Serv00 Three-in-One Protocol Script [VPS+Router]"

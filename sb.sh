@@ -313,7 +313,7 @@ readp "Please select【1-2】：" menu
 if [ -z "$menu" ] || [ "$menu" = "1" ] ; then
 zqzs
 else
-bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/acme.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/acme.sh)
 if [[ ! -f /root/ygkkkca/cert.crt && ! -f /root/ygkkkca/private.key && ! -s /root/ygkkkca/cert.crt && ! -s /root/ygkkkca/private.key ]]; then
 red "Acme certificate application failed，Continue usingself-signed certificate" 
 zqzs
@@ -3426,7 +3426,7 @@ inssbjsonser
 sbservice
 sbactive
 #curl -sL https://gitlab.com/rwkgyg/sing-box-yg/-/raw/main/version/version | awk -F "Update content" '{print $1}' | head -n 1 > /etc/s-box/v
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/version | awk -F "Update content" '{print $1}' | head -n 1 > /etc/s-box/v
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/version | awk -F "Update content" '{print $1}' | head -n 1 > /etc/s-box/v
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 lnsb && blue "Sing-box-yg Script installed successfully, script shortcut: sb" && cronsb
 echo
@@ -5972,7 +5972,7 @@ rm /tmp/crontab.tmp
 
 lnsb(){
 rm -rf /usr/bin/sb
-curl -L -o /usr/bin/sb -# --retry 2 --insecure https://raw.githubusercontent.com/anyagixx/proxme2/main/sb.sh
+curl -L -o /usr/bin/sb -# --retry 2 --insecure https://raw.githubusercontent.com/anyagixx/proxme3/main/sb.sh
 chmod +x /usr/bin/sb
 }
 
@@ -5981,7 +5981,7 @@ if [[ ! -f '/usr/bin/sb' ]]; then
 red "Sing-box-yg not properly installed" && sleep 2 && sb
 fi
 lnsb
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/version | awk -F "Update content" '{print $1}' | head -n 1 > /etc/s-box/v
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/version | awk -F "Update content" '{print $1}' | head -n 1 > /etc/s-box/v
 green "Sing-box-yg installation script upgraded successfully" && sleep 5 && sb
 }
 
@@ -6060,7 +6060,7 @@ iptables -t nat -F PREROUTING >/dev/null 2>&1
 netfilter-persistent save >/dev/null 2>&1
 service iptables save >/dev/null 2>&1
 green "Sing-box uninstallation complete!"
-blue "Welcome to continue using Sing-box-yg script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/sb.sh)"
+blue "Welcome to continue using Sing-box-yg script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/sb.sh)"
 echo
 }
 
@@ -6175,11 +6175,11 @@ fi
 
 acme(){
 #bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
-bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/acme.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/acme.sh)
 }
 cfwarp(){
 #bash <(curl -Ls https://gitlab.com/rwkgyg/CFwarp/raw/main/CFwarp.sh)
-bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/CFwarp.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/CFwarp.sh)
 }
 bbr(){
 if [[ $vi =~ lxc|openvz ]]; then
@@ -6299,7 +6299,7 @@ case $(uname -m) in
 aarch64) cpu=arm64;;
 x86_64) cpu=amd64;;
 esac
-curl -L -o /etc/s-box/sbwpph -# --retry 2 --insecure https://raw.githubusercontent.com/anyagixx/proxme2/main/sbwpph_$cpu
+curl -L -o /etc/s-box/sbwpph -# --retry 2 --insecure https://raw.githubusercontent.com/anyagixx/proxme3/main/sbwpph_$cpu
 chmod +x /etc/s-box/sbwpph
 fi
 if [[ -n $(ps -e | grep sbwpph) ]]; then
@@ -6426,19 +6426,19 @@ fi
 
 sbsm(){
 echo
-green "GitHub Project: https://github.com/anyagixx/proxme2 for latest proxy protocols and bypass updates"
+green "GitHub Project: https://github.com/anyagixx/proxme3 for latest proxy protocols and bypass updates"
 echo
 blue "sing-box-yg script video tutorial: https://www.youtube.com/playlist?list=PLMgly2AulGG_Affv6skQXWnVqw7XWiPwJ"
 echo
 blue "sing-box-yg script blog description: http://ygkkk.blogspot.com/2023/10/sing-box-yg.html"
 echo
-blue "This fork project: https://github.com/anyagixx/proxme2"
+blue "This fork project: https://github.com/anyagixx/proxme3"
 echo
-blue "Project: https://github.com/anyagixx/proxme2"
+blue "Project: https://github.com/anyagixx/proxme3"
 echo
 blue "Recommended new product: ArgoSB one-click non-interactive compact script"
 blue "Supports: AnyTLS, Any-reality, Vless-xhttp-reality, Vless-reality-vision, Shadowsocks-2022, Hysteria2, Tuic, Vmess-ws, Argo temporary/fixed tunnel"
-blue "ArgoSB project address: https://github.com/anyagixx/proxme2"
+blue "ArgoSB project address: https://github.com/anyagixx/proxme3"
 echo
 }
 
@@ -6451,7 +6451,7 @@ echo -e "${bblue}     ░██        ░${plain}██    ░██ ██    
 echo -e "${bblue}     ░██ ${plain}        ░██    ░░██        ░██ ░██       ░${red}██ ░██       ░██ ░██ ${plain}  "
 echo -e "${bblue}     ░█${plain}█          ░██ ██ ██         ░██  ░░${red}██     ░██  ░░██     ░██  ░░██ ${plain}  "
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
-white "GitHub Project  ：github.com/anyagixx/proxme2"
+white "GitHub Project  ：github.com/anyagixx/proxme3"
 white "Original Author Blog ：ygkkk.blogspot.com"
 white "Original Author YouTube ：www.youtube.com/@ygkkk"
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
@@ -6484,14 +6484,14 @@ white "-------------------------------------------------------------------------
 green " 0. Exit script"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 insV=$(cat /etc/s-box/v 2>/dev/null)
-latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/version | awk -F "Update content" '{print $1}' | head -n 1)
+latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/version | awk -F "Update content" '{print $1}' | head -n 1)
 if [ -f /etc/s-box/v ]; then
 if [ "$insV" = "$latestV" ]; then
 echo -e "Current Sing-box-yg script Latest version: ${bblue}${insV}${plain} (Already installed)"
 else
 echo -e "Current Sing-box-yg script Version: ${bblue}${insV}${plain}"
 echo -e "Detected latest Sing-box-yg script Version: ${yellow}${latestV}${plain} (can select 7 to update)"
-echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/version)${plain}"
+echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/version)${plain}"
 fi
 else
 echo -e "Current Sing-box-yg script Version: ${bblue}${latestV}${plain}"

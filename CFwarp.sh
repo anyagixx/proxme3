@@ -54,14 +54,14 @@ esac
 
 cfwarpshow(){
 insV=$(cat /root/warpip/v 2>/dev/null)
-latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1)
+latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1)
 if [[ -f /root/warpip/v ]]; then
 if [ "$insV" = "$latestV" ]; then
 echo -e " Current CFwarp script version: ${bblue}${insV}${plain} (latest version)"
 else
 echo -e " Current CFwarp script version: ${bblue}${insV}${plain}"
 echo -e " Latest CFwarp script version detected: ${yellow}${latestV}${plain} (select 8 to update)"
-echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/warp-version)${plain}"
+echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/warp-version)${plain}"
 fi
 else
 echo -e " Current CFwarp script version: ${bblue}${latestV}${plain}"
@@ -288,7 +288,7 @@ fi
 }
 
 lncf(){
-curl -sSL -o /usr/bin/cf -L https://raw.githubusercontent.com/anyagixx/proxme2/main/CFwarp.sh
+curl -sSL -o /usr/bin/cf -L https://raw.githubusercontent.com/anyagixx/proxme3/main/CFwarp.sh
 chmod +x /usr/bin/cf
 }
 
@@ -297,7 +297,7 @@ if [[ ! -f '/usr/bin/cf' ]]; then
 red "CFwarp script not installed properly!" && exit
 fi
 lncf
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1 > /root/warpip/v
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1 > /root/warpip/v
 green "CFwarp script updated successfully" && cf
 }
 
@@ -868,7 +868,7 @@ else
 CheckWARP
 fi
 ShowWGCF && lncf && reswarp
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1 > /root/warpip/v
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/warp-version | awk -F "Update content" '{print $1}' | head -n 1 > /root/warpip/v
 }
 
 warpinscha(){
@@ -1103,7 +1103,7 @@ echo -e "${bblue}     ░██ ${plain}        ░██    ░░██       
 echo -e "${bblue}     ░█${plain}█          ░██ ██ ██         ░██  ░░${red}██     ░██  ░░██     ░██  ░░██ ${plain}  "
 echo
 white "CFwarp Script - Full English Version"
-white "GitHub Project: https://github.com/anyagixx/proxme2"
+white "GitHub Project: https://github.com/anyagixx/proxme3"
 green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 yellow " Select WARP solution that suits you (options 1, 2, 3, can be single or multiple coexistence)"
 yellow " Script shortcut: cf"

@@ -241,7 +241,7 @@ uninstall_singbox() {
           source ~/.bashrc
           purple "************************************************************"
           purple "Serv00/Hostuno-sb-yg uninstall completed!"
-          purple "Welcome to continue using the script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00.sh)"
+          purple "Welcome to continue using the script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00.sh)"
           purple "************************************************************"
           ;;
         [Nn]) exit 0 ;;
@@ -259,7 +259,7 @@ reading "\nWarning!!! This will clear all processes and all installation content
     source ~/.bashrc
     purple "************************************************************"
     purple "Serv00/Hostuno-sb-yg cleanup reset completed!"
-    purple "Welcome to continue using the script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00.sh)"
+    purple "Welcome to continue using the script: bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00.sh)"
     purple "************************************************************"
     find ~ -type f -exec chmod 644 {} \; 2>/dev/null
     find ~ -type d -exec chmod 755 {} \; 2>/dev/null
@@ -741,7 +741,7 @@ Argo domain: ${argodomain}
 $vl_link
 
 Note: If you entered CF domain as reality domain earlier, the following features will be activated:
-Can be applied in https://github.com/anyagixx/proxme2 project to create CF vless/trojan nodes
+Can be applied in https://github.com/anyagixx/proxme3 project to create CF vless/trojan nodes
 1. Proxyip (with port) info:
 Method 1 global application: set variable name: proxyip    set variable value: $IP:$vless_port  
 Method 2 single node application: change path to: /pyip=$IP:$vless_port
@@ -908,7 +908,7 @@ if [[ -e $WORKDIR/config.json ]]; then
   COMMAND="sb"
   SCRIPT_PATH="$HOME/bin/$COMMAND"
   mkdir -p "$HOME/bin"
-  curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00.sh > "$SCRIPT_PATH"
+  curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00.sh > "$SCRIPT_PATH"
   chmod +x "$SCRIPT_PATH"
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
@@ -916,15 +916,15 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     source ~/.bashrc
 fi
 if [ "$hona" = "serv00" ]; then
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/app.js -o "$keep_path"/app.js
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/app.js -o "$keep_path"/app.js
 sed -i '' "15s/name/$snb/g" "$keep_path"/app.js
 sed -i '' "59s/key/$UUID/g" "$keep_path"/app.js
 sed -i '' "90s/name/$USERNAME/g" "$keep_path"/app.js
 sed -i '' "90s/where/$snb/g" "$keep_path"/app.js
-curl -sSL https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00keep.sh -o serv00keep.sh && chmod +x serv00keep.sh
+curl -sSL https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00keep.sh -o serv00keep.sh && chmod +x serv00keep.sh
 fi
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/index.html -o "$FILE_PATH"/index.html
-curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/sversion | awk -F "Update content" '{print $1}' | head -n 1 > $WORKDIR/v
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/index.html -o "$FILE_PATH"/index.html
+curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/sversion | awk -F "Update content" '{print $1}' | head -n 1 > $WORKDIR/v
 else
 red "Script not installed, please select 1 to install" && exit
 fi
@@ -1025,7 +1025,7 @@ get_links
 menu() {
    clear
    echo "============================================================"
-green "GitHub Project: github.com/anyagixx/proxme2"
+green "GitHub Project: github.com/anyagixx/proxme3"
 green "Original Author Blog: ygkkk.blogspot.com"
 green "Original Author YouTube: www.youtube.com/@ygkkk"
    green "Serv00/Hostuno Three-Protocol Coexistence Script: vless-reality/Vmess-ws(Argo)/Hy2"
@@ -1088,14 +1088,14 @@ yellow "No ports set"
 fi
 echo
 insV=$(cat $WORKDIR/v 2>/dev/null)
-latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/sversion | awk -F "Update content" '{print $1}' | head -n 1)
+latestV=$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/sversion | awk -F "Update content" '{print $1}' | head -n 1)
 if [ -f $WORKDIR/v ]; then
 if [ "$insV" = "$latestV" ]; then
 echo -e "Current Serv00/Hostuno-sb-yg script latest version: ${purple}${insV}${re} (installed)"
 else
 echo -e "Current Serv00/Hostuno-sb-yg script version: ${purple}${insV}${re}"
 echo -e "Detected latest Serv00/Hostuno-sb-yg script version: ${yellow}${latestV}${re} (select 5 to update)"
-echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme2/main/sversion)${re}"
+echo -e "${yellow}$(curl -sL https://raw.githubusercontent.com/anyagixx/proxme3/main/sversion)${re}"
 fi
 echo -e "========================================================="
 sbb=$(cat $WORKDIR/sb.txt 2>/dev/null)

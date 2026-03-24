@@ -1,4 +1,4 @@
-# ProxMe2 - Sing-box Proxy Scripts (English Version)
+# ProxMe3 - Sing-box Proxy Scripts (English Version)
 
 > Fork of [yonggekkk/sing-box-yg](https://github.com/yonggekkk/sing-box-yg) with full English translation and additional features.
 
@@ -40,7 +40,7 @@
 ### Installation:
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/sb.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/sb.sh)
 ```
 
 ---
@@ -55,7 +55,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/sb.sh)
 ### Installation:
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme2/main/serv00.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/anyagixx/proxme3/main/serv00.sh)
 ```
 
 ---

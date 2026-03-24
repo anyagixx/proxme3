@@ -1,5 +1,5 @@
 addEventListener('scheduled', event => event.waitUntil(handleScheduled()));
-// Works with ProxMe2 Serv00 SSH script or Github/VPS/Router script to generate keep-alive and restart web pages
+// Works with ProxMe3 Serv00 SSH script or Github/VPS/Router script to generate keep-alive and restart web pages
 // Separate each keep-alive/up page or restart/re page with space, comma, or Chinese comma, prefix with http://
 const urlString = 'http://keepalive-or-restart-page1 http://keepalive-or-restart-page2 http://keepalive-or-restart-page3 ...';
 const urls = urlString.split(/[\s,，]+/);

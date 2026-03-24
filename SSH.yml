@@ -25,7 +25,7 @@ jobs:
         run: |
            echo "*****************************************************"
            echo "*****************************************************"
-echo "GitHub Project: github.com/anyagixx/proxme2"
+echo "GitHub Project: github.com/anyagixx/proxme3"
 echo "Original Author Blog: ygkkk.blogspot.com"
 echo "Original Author YouTube: www.youtube.com/@ygkkk"
            echo "VPS Server Remote SSH Login Script [GitHub]"

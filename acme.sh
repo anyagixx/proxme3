@@ -424,7 +424,7 @@ echo -e "${bblue}     ░██ ${plain}        ░██    ░░██       
 echo -e "${bblue}     ░█${plain}█          ░██ ██ ██         ░██  ░░${red}██     ░██  ░░██     ░██  ░░██ ${plain}  "
 green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 white "Acme-yg Script - Full English Version"
-white "GitHub Project: https://github.com/anyagixx/proxme2"
+white "GitHub Project: https://github.com/anyagixx/proxme3"
 yellow "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 green "Acme-yg script version V2023.12.18 (English Translation)"
 yellow "Notes:"
